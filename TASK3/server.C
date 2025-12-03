@@ -32,7 +32,7 @@ protected:
 
 int main(){
 	srand(time(nullptr));
-	MySrv srv(2022,25);
+	MySrv srv(2023,25);
 	srv.run();
 }
 
@@ -42,21 +42,26 @@ string MySrv::myResponse(string input){
     if(input.compare(0,4,"INIT") == 0){
     //initalize a new game
 
-    return string("OKAY");
+        return string("OKAY");
     }
 
     if(input.compare(0,6,"COORD[") == 0){
-    //verarveite Koordinaten
+        //verarveite Koordinaten
 
-    string strIntX;
-    strIntX = input.substr(5,input.find(","));
+        /*string strIntX;
+        strIntX = input.substr(5,input.find(","));
 
-    TASK3::ShootResult res;
-    res = TASK3::WATER;
+        TASK3::ShootResult res;
+        res = TASK3::WATER;
 
-    string msg = to_string(res);
+        string msg = to_string(res);*/
 
-    return string(msg);
+        int start = input.find('[');
+        int ende = input.find(',');
+
+        string X_value = input.substr(start + 1, ende - (start +1));
+
+        return string(X_value);
     }
 
     return (string("UNKNWON_COMMAND"));
