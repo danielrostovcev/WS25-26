@@ -17,6 +17,8 @@
 #include <netinet/in.h> //contains constants and structures needed for internet domain addresses
 
 #include <string>
+#include<iostream>
+#include "TASK3.H"
 
 #include "SIMPLESOCKET.H"
 
@@ -36,5 +38,26 @@ int main(){
 
 
 string MySrv::myResponse(string input){
-    return (string("OKAY"));
+
+    if(input.compare(0,4,"INIT") == 0){
+    //initalize a new game
+
+    return string("OKAY");
+    }
+
+    if(input.compare(0,6,"COORD[") == 0){
+    //verarveite Koordinaten
+
+    string strIntX;
+    strIntX = input.substr(5,input.find(","));
+
+    TASK3::ShootResult res;
+    res = TASK3::WATER;
+
+    string msg = to_string(res);
+
+    return string(msg);
+    }
+
+    return (string("UNKNWON_COMMAND"));
 }
