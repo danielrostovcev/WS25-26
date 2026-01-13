@@ -27,6 +27,8 @@ public:
     MySrv(int port, int bufferSize) : TCPserver(port, bufferSize){};
 protected:
     string myResponse(string input);
+private:
+    TASK3::World* w_ = nullptr;
 
 };
 
@@ -41,28 +43,38 @@ string MySrv::myResponse(string input){
 
     if(input.compare(0,4,"INIT") == 0){
     //initalize a new game
+        delete w_;
+        w_ = new TASK3::World();
 
         return string("OKAY");
     }
 
-    if(input.compare(0,6,"COORD[") == 0){
+    if(input.compare(0,6,"COORD(") == 0){
         //verarveite Koordinaten
 
-        /*string strIntX;
-        strIntX = input.substr(5,input.find(","));
+        if(!w_) return "ERROR_NO_GAME";
 
-        TASK3::ShootResult res;
-        res = TASK3::WATER;
+        int start = input.find('(');
+        int mitte = input.find(',');
+        int ende  = input.find(')');
 
-        string msg = to_string(res);*/
+        string X_value = input.substr(start + 1, mitte - (start +1));
+        string Y_value = input.substr(mitte + 1, ende - (mitte +1));
 
-        int start = input.find('[');
-        int ende = input.find(',');
+        int x = stoi(X_value);
+        int y = stoi(Y_value);
 
-        string X_value = input.substr(start + 1, ende - (start +1));
+        TASK3::ShootResult res = w_->shoot(x,y);
 
-        return string(X_value);
+    switch(res){
+
+        case TASK3::WATER: return "WATER";
+        case TASK3::SHIP_HIT: return "SHIP_HIT";
+        case TASK3::SHIP_DESTROYED: return "SHIP_DESTROYED";
+        case TASK3::GAME_OVER: return "GAME_OVER";
+        default: return "UNKNOWN";
     }
 
-    return (string("UNKNWON_COMMAND"));
+}
+return string("UNKNWON_COMMAND");
 }
