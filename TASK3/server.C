@@ -24,7 +24,7 @@
 
 class MySrv : public TCPserver{
 public:
-    MySrv(int port, int bufferSize) : TCPserver(port, bufferSize){};
+    MySrv(int port, int bufferSize) : TCPserver(port, bufferSize){w_ = new TASK3::World();};
 protected:
     string myResponse(string input);
 private:
