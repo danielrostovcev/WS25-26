@@ -20,6 +20,9 @@ int main() {
 
 	c.conn(host, 2023);
 
+	int shots = 0;
+	int hits = 0;
+
 	//INIT
 	c.sendData("INIT");
 	c.receive(32);
@@ -28,12 +31,19 @@ int main() {
         for(int x = 1; x <= 10; x++){
         string req = "COORD(" + to_string(x) + "," + to_string(y) + ")";
         c.sendData(req);
+        shots++;
 
         string res = c.receive(32);
+        if(res == "SHIP_HIT" || res == "SHIP_DESTROYED"){
+            hits++;
+        }
         cout << req << " -> " << res << endl;
 
         if(res == "GAME_OVER"){
-            cout << "Spiel beendet" << endl;
+            float shots_f = shots;
+            float quote = (hits/shots_f);
+            cout << "Spiel beendet" << endl << "benötigte Züge: " << shots << endl << "davon getroffen: " << hits << endl;
+            cout << "Trefferquote: " << quote * 100 <<"%" << endl;
             return 0;
         }
         }
