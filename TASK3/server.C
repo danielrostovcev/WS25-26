@@ -22,51 +22,57 @@
 
 #include "SIMPLESOCKET.H"
 
+//Klasse MySrv erbt von TCPserver. Sie erweitert den allgemeinen TCPserver um die Spiellogik von Battleship.
+
 class MySrv : public TCPserver{
 public:
     MySrv(int port, int bufferSize) : TCPserver(port, bufferSize){w_ = new TASK3::World();};
+                        //Konstruktor übergibt port und puffergroesse an die Basisklasse TCPserver und erstellt eine neue Spielwelt
+    ~MySrv(){
+        delete w_;  //Destruktor gibt den reservierten Speicher wieder für die Spielwelt frei
+    }
 protected:
-    string myResponse(string input);
+    string myResponse(string input);   //überschreibt die virtuelle methode der Basisklasse und verarbeitet eingehende Nachrichten vom Client
 private:
-    TASK3::World* w_ = nullptr;
+    TASK3::World* w_ = nullptr;   //Zeiger auf die aktuelle Spielwelt, wird bei INIT neu erstellt
 
 };
 
 int main(){
-	srand(time(nullptr));
-	MySrv srv(2023,25);
-	srv.run();
+	srand(time(nullptr));  //Zufallsgenerator
+	MySrv srv(2023,25);    //Erstellen des Server-Objekts auf Port 2023
+	srv.run();              //Startet die Server-Schleife
 }
 
 
 string MySrv::myResponse(string input){
 
-    if(input.compare(0,4,"INIT") == 0){
+    if(input.compare(0,4,"INIT") == 0){  //Wenn der Client INIT sendet, wird eine neue Spielwelt erzeugt
     //initalize a new game
-        delete w_;
+        delete w_;                  //alte Spielwelt löschen und neue Spielwelt erzeugen
         w_ = new TASK3::World();
 
-        return string("OKAY");
+        return string("OKAY");      //Bestätigung an Client
     }
 
-    if(input.compare(0,6,"COORD(") == 0){
+    if(input.compare(0,6,"COORD(") == 0){       //Wenn der Client eine Koordinate sendet im Format COORD(x,y)
         //verarveite Koordinaten
 
-        if(!w_) return "ERROR_NO_GAME";
+        if(!w_) return "ERROR_NO_GAME";         //Falls keine Spielwelt existiert -> Fehler
 
-        int start = input.find('(');
+        int start = input.find('(');        //Position der Klammern und des Kommas ermitteln
         int mitte = input.find(',');
         int ende  = input.find(')');
 
-        string X_value = input.substr(start + 1, mitte - (start +1));
+        string X_value = input.substr(start + 1, mitte - (start +1));   //Teilstrings für X und Y extrahieren
         string Y_value = input.substr(mitte + 1, ende - (mitte +1));
 
-        int x = stoi(X_value);
+        int x = stoi(X_value);          //Umwandlung der Strings in Integer
         int y = stoi(Y_value);
 
-        TASK3::ShootResult res = w_->shoot(x,y);
+        TASK3::ShootResult res = w_->shoot(x,y);        //Aufruf der shoot-Funktion der Spielwelt
 
-    switch(res){
+    switch(res){        //Auswertung der Ergebnisse und Rückgabe an den Client
 
         case TASK3::WATER: return "WATER";
         case TASK3::SHIP_HIT: return "SHIP_HIT";
@@ -76,5 +82,5 @@ string MySrv::myResponse(string input){
     }
 
 }
-return string("UNKNWON_COMMAND");
+return string("UNKNWON_COMMAND");  //Falls keine bekannte Nachricht empfangen wurde
 }
